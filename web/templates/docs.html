@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block pagina %}docs{% endblock %}
+{% block cabeza %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+{% endblock %}
+{% block encabezado %}<h1 class="mb-6">Documentación de la API</h1>{% endblock %}
+{% block contenido %}
+<section class="mb-6 grid gap-4 md:grid-cols-3">
+  <div class="tarjeta p-5"><p class="text-sm font-bold text-uni-azul">1 · Iniciar sesión</p><p class="mt-1 text-sm text-slate-600">Abre <code>POST /api/login</code>, pulsa <em>Try it out</em> y <em>Execute</em>.</p></div>
+  <div class="tarjeta p-5"><p class="text-sm font-bold text-uni-azul">2 · Copiar el token</p><p class="mt-1 text-sm text-slate-600">Copia el valor de <code>token</code> de la respuesta, sin comillas.</p></div>
+  <div class="tarjeta p-5"><p class="text-sm font-bold text-uni-azul">3 · Autorizar</p><p class="mt-1 text-sm text-slate-600">Pulsa <em>Authorize</em> y pégalo. Cada petición llevará <code>Authorization: Bearer …</code></p></div>
+</section>
+<p class="mb-6 rounded-xl border border-dashed border-uni-amarillo bg-uni-amarillo-claro p-4 text-sm text-slate-700">
+  Esta documentación describe lo que el equipo de desarrollo <em>dice</em> que hace la API. En una prueba de caja gris,
+  compárala con el código: ¿hay rutas o campos que no estén documentados?
+</p>
+<div id="swagger-ui" class="tarjeta p-2"></div>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+<script src="{{ url_for('web.static', filename='swagger-init.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block pagina %}reporte{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+  <form id="form-reporte" class="flex flex-wrap items-end gap-4">
+    <div class="w-48">
+      <label class="etiqueta" for="dias">Días hacia atrás</label>
+      <input class="campo" id="dias" name="dias" type="number" value="30" min="1" max="90">
+    </div>
+    <button type="submit" class="boton">Consultar</button>
+    <p class="text-sm text-slate-500">Total en el rango: <strong class="text-uni-azul" id="total-reporte">–</strong> citas</p>
+  </form>
+  <div class="mt-6 overflow-x-auto">
+    <table class="tabla">
+      <thead><tr><th class="w-36">Fecha</th><th>Citas</th></tr></thead>
+      <tbody id="lista-reporte"><tr><td colspan="2" class="text-slate-500">Consulta un rango de días.</td></tr></tbody>
+    </table>
+  </div>
+  <p class="mt-4 text-xs text-slate-500">Solo se muestran los días con al menos una cita.</p>
+</section>
+{% endblock %}

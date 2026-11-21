@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block pagina %}detalle{% endblock %}
+{% block encabezado %}
+<a class="mb-4 inline-flex items-center gap-1 text-sm font-semibold no-underline hover:underline" href="{{ url_for('web.citas') }}">← Mis citas</a>
+<div class="mb-6 flex flex-wrap items-center gap-3">
+  <h1>Cita n.º {{ cita_id }}</h1>
+  <span id="d-estado-insignia" class="insignia insignia-cancelada" hidden></span>
+</div>
+{% endblock %}
+{% block contenido %}
+<div class="grid items-start gap-6 lg:grid-cols-3">
+  <section class="tarjeta lg:col-span-2" id="detalle" data-cita="{{ cita_id }}">
+    <dl class="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+      <div><dt class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Fecha</dt><dd class="mt-1 text-lg font-semibold" id="d-fecha">—</dd></div>
+      <div><dt class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Servicio</dt><dd class="mt-1 text-lg font-semibold" id="d-servicio">—</dd></div>
+      <div class="sm:col-span-2"><dt class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Motivo</dt><dd class="mt-1" id="d-motivo">—</dd></div>
+      <div><dt class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Estado</dt><dd class="mt-1" id="d-estado">—</dd></div>
+      <div><dt class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Estudiante · Profesional (id)</dt><dd class="mt-1"><span id="d-estudiante">—</span> · <span id="d-profesional">—</span></dd></div>
+    </dl>
+    <div class="mt-6 rounded-xl border border-uni-amarillo/60 bg-uni-amarillo-claro p-4">
+      <p class="text-xs font-semibold tracking-wide text-uni-azul uppercase">Notas clínicas</p>
+      <p class="mt-1 whitespace-pre-wrap text-slate-800" id="d-notas">—</p>
+    </div>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <button type="button" id="cancelar" class="boton boton-peligro" data-requiere="estudiante">Cancelar cita</button>
+      <button type="button" id="atendida" class="boton" data-requiere="profesional">Marcar como atendida</button>
+    </div>
+  </section>
+  <section class="tarjeta h-fit" data-requiere="profesional">
+    <h2>Registrar notas clínicas</h2>
+    <p class="mt-1 mb-4 text-sm text-slate-500">Solo visibles para el profesional asignado.</p>
+    <form id="form-notas" class="space-y-4">
+      <label class="etiqueta sr-only" for="notas">Notas</label>
+      <textarea class="campo" id="notas" name="notas" rows="6" maxlength="2000"></textarea>
+      <button type="submit" class="boton w-full">Guardar notas</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

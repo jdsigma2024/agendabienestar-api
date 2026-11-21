@@ -1,0 +1,59 @@
+/* Fuente de los estilos de AgendaBienestar (Tailwind CSS v4).
+   El archivo que usa la aplicación es web/static/estilos.css, ya compilado.
+   Solo hay que recompilar si se cambian clases en las plantillas o en app.js:
+     npx @tailwindcss/cli -i web/tailwind/entrada.css -o web/static/estilos.css --minify  */
+@import "tailwindcss";
+@source "../templates";
+@source "../static/app.js";
+
+@theme {
+  --color-uni-azul: #041C75;
+  --color-uni-azul-oscuro: #020F45;
+  --color-uni-azul-claro: #E8ECF8;
+  --color-uni-amarillo: #FFC72C;
+  --color-uni-amarillo-claro: #FFF6DA;
+  --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  body { @apply bg-slate-50 text-slate-800 antialiased; }
+  h1 { @apply text-2xl font-bold tracking-tight text-uni-azul sm:text-3xl; }
+  h2 { @apply text-lg font-semibold text-uni-azul; }
+  a { @apply text-uni-azul underline-offset-2; }
+  code { @apply rounded bg-uni-azul-claro px-1.5 py-0.5 text-[0.85em] text-uni-azul; }
+  [hidden] { display: none !important; }
+}
+
+@layer components {
+  .tarjeta { @apply rounded-2xl border border-slate-200 bg-white p-6 shadow-sm; }
+  .etiqueta { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
+  .campo { @apply block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-xs transition
+                  placeholder:text-slate-400 focus:border-uni-azul focus:ring-4 focus:ring-uni-amarillo/50 focus:outline-none; }
+  .boton { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-uni-azul px-5 py-2.5 font-semibold text-white
+                  shadow-sm transition hover:bg-uni-azul-oscuro focus:ring-4 focus:ring-uni-amarillo/60 focus:outline-none
+                  cursor-pointer disabled:opacity-60; }
+  .boton-amarillo { @apply bg-uni-amarillo text-uni-azul hover:bg-amber-300; }
+  .boton-peligro { @apply bg-red-700 hover:bg-red-800; }
+  .boton-claro { @apply bg-white/10 text-white ring-1 ring-white/40 shadow-none hover:bg-white/20; }
+
+  .tabla { @apply w-full text-left text-sm; }
+  .tabla thead th { @apply border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500; }
+  .tabla tbody td { @apply border-b border-slate-100 px-4 py-3 align-middle; }
+  .tabla tbody tr:hover { @apply bg-uni-azul-claro/40; }
+  .tabla tbody tr:last-child td { @apply border-b-0; }
+
+  .insignia { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset; }
+  .insignia::before { content: ""; @apply size-1.5 rounded-full bg-current; }
+  .insignia-programada { @apply bg-blue-50 text-blue-800 ring-blue-200; }
+  .insignia-atendida { @apply bg-emerald-50 text-emerald-800 ring-emerald-200; }
+  .insignia-cancelada { @apply bg-slate-100 text-slate-600 ring-slate-300; }
+
+  .mensaje { @apply mb-6 flex items-start gap-3 rounded-xl border px-4 py-3 text-sm font-medium; }
+  .mensaje-info { @apply border-uni-azul/20 bg-uni-azul-claro text-uni-azul; }
+  .mensaje-exito { @apply border-emerald-200 bg-emerald-50 text-emerald-800; }
+  .mensaje-error { @apply border-red-200 bg-red-50 text-red-800; }
+
+  .barra-dato { @apply h-2.5 rounded-full bg-linear-to-r from-uni-azul to-blue-500; }
+  .nav-enlace { @apply rounded-lg px-3 py-2 text-sm font-medium text-white/85 no-underline transition hover:bg-white/10 hover:text-white; }
+  .nav-activo { @apply bg-white/15 text-white; }
+}

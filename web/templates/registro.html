@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block pagina %}registro{% endblock %}
+{% block encabezado %}{% endblock %}
+{% block contenido %}
+<div class="mx-auto max-w-lg">
+  <section class="tarjeta p-8 sm:p-10">
+    <h1>Crear cuenta</h1>
+    <p class="mt-1 mb-6 text-sm text-slate-500">Las cuentas nuevas son de estudiante.</p>
+    <form id="form-registro" class="space-y-5">
+      <div>
+        <label class="etiqueta" for="nombre">Nombre completo</label>
+        <input class="campo" id="nombre" name="nombre" required maxlength="80">
+      </div>
+      <div>
+        <label class="etiqueta" for="correo">Correo institucional</label>
+        <input class="campo" id="correo" name="correo" type="email" required placeholder="usuario@uniminuto.edu.co">
+      </div>
+      <div>
+        <label class="etiqueta" for="clave">Clave</label>
+        <input class="campo" id="clave" name="clave" type="password" autocomplete="new-password" required>
+        <p class="mt-1.5 text-xs text-slate-500">Mínimo 10 caracteres.</p>
+      </div>
+      <button type="submit" class="boton w-full">Crear cuenta</button>
+    </form>
+    <p class="mt-6 text-center text-sm"><a class="font-semibold" href="{{ url_for('web.inicio') }}">← Volver al inicio de sesión</a></p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block pagina %}citas{% endblock %}
+{% block encabezado %}
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1>Mis citas</h1>
+    <p class="mt-1 text-sm text-slate-500" id="saludo">Consulta el estado de tus citas de Bienestar.</p>
+  </div>
+</div>
+{% endblock %}
+{% block contenido %}
+<div class="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
+  <div class="tarjeta p-4 sm:p-5"><p class="text-xs text-slate-500 sm:text-sm">Programadas</p><p class="mt-1 text-3xl font-bold text-uni-azul" id="total-programada">–</p></div>
+  <div class="tarjeta p-4 sm:p-5"><p class="text-xs text-slate-500 sm:text-sm">Atendidas</p><p class="mt-1 text-3xl font-bold text-emerald-700" id="total-atendida">–</p></div>
+  <div class="tarjeta p-4 sm:p-5"><p class="text-xs text-slate-500 sm:text-sm">Canceladas</p><p class="mt-1 text-3xl font-bold text-slate-500" id="total-cancelada">–</p></div>
+</div>
+<div class="grid items-start gap-6 lg:grid-cols-3">
+  <section class="tarjeta overflow-hidden p-0 lg:col-span-2">
+    <div class="border-b border-slate-200 px-6 py-4"><h2>Citas</h2></div>
+    <div class="overflow-x-auto">
+      <table class="tabla">
+        <thead><tr><th>N.º</th><th>Fecha</th><th>Servicio</th><th>Motivo</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+        <tbody id="lista-citas"><tr><td colspan="6" class="text-slate-500">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+  <section class="tarjeta h-fit" data-requiere="estudiante">
+    <h2>Solicitar una cita</h2>
+    <p class="mt-1 mb-5 text-sm text-slate-500">Un profesional de Bienestar te atenderá.</p>
+    <form id="form-cita" class="space-y-4">
+      <div>
+        <label class="etiqueta" for="fecha">Fecha</label>
+        <input class="campo" id="fecha" name="fecha" type="date" required>
+      </div>
+      <div>
+        <label class="etiqueta" for="servicio">Servicio</label>
+        <select class="campo" id="servicio" name="servicio">
+          <option>Psicología</option>
+          <option>Asesoría académica</option>
+          <option>Salud</option>
+        </select>
+      </div>
+      <div>
+        <label class="etiqueta" for="motivo">Motivo <span class="font-normal text-slate-400">(opcional)</span></label>
+        <textarea class="campo" id="motivo" name="motivo" rows="3" maxlength="300"></textarea>
+      </div>
+      <button type="submit" class="boton boton-amarillo w-full">Solicitar cita</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

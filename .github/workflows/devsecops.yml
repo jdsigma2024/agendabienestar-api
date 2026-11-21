@@ -1,0 +1,43 @@
+# Pipeline DevSecOps de AgendaBienestar: cada push o pull request pasa por
+# secretos -> SAST -> SCA -> pruebas de seguridad. Si un paso falla, no se integra.
+name: devsecops
+on: [push, pull_request]
+
+jobs:
+  secretos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install bandit
+      # Falla si hay hallazgos de severidad media o alta en la version que se despliega
+      - run: bandit -r seguro -ll
+
+  sca:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install pip-audit
+      - run: pip-audit -r requirements.txt
+
+  pruebas-seguridad:
+    needs: [secretos, sast, sca]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -r requirements.txt
+      - run: APP=seguro pytest -v

@@ -1,0 +1,19 @@
+# Blueprint de Render para AgendaBienestar.
+# Render > New > Blueprint > seleccione este repositorio.
+# Crea UN servicio con la version vulnerable. Para desplegar la version corregida,
+# cambie "vulnerable" por "seguro" en startCommand (o duplique el servicio).
+services:
+  - type: web
+    name: agendabienestar-vulnerable
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # Un solo proceso: SQLite y el limite de intentos viven en ese proceso.
+    startCommand: gunicorn --chdir vulnerable app:app --workers 1 --threads 4 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: BIENESTAR_SECRET
+        generateValue: true
+      - key: DETRAS_DE_PROXY
+        value: "1"

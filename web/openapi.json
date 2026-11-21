@@ -1,0 +1,632 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AgendaBienestar UNIMINUTO API - Jose Sanchez",
+    "version": "0.9",
+    "description": "API de citas de Bienestar Universitario (psicología, asesoría académica y salud).\n\n**Uso académico** para la asignatura Desarrollo de Software Seguro. Los datos son ficticios.\n\nCuenta autorizada para la prueba: `carlos@uniminuto.edu.co` / `Carlos2026*`.\n\nPara usar los endpoints protegidos: ejecute **POST /api/login**, copie el `token` y péguelo en **Authorize**."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Este mismo servidor"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticación"
+    },
+    {
+      "name": "Citas"
+    },
+    {
+      "name": "Reportes"
+    }
+  ],
+  "paths": {
+    "/api/registro": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Crear una cuenta de estudiante",
+        "operationId": "registrar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Registro"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                },
+                "example": {
+                  "mensaje": "Usuario creado"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Iniciar sesión y obtener un token",
+        "operationId": "iniciarSesion",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credenciales"
+              },
+              "example": {
+                "correo": "carlos@uniminuto.edu.co",
+                "clave": "Carlos2026*"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Demasiados intentos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mis-citas": {
+      "get": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Listar las citas del usuario autenticado",
+        "operationId": "misCitas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de citas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cita"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citas": {
+      "post": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Solicitar una cita (estudiante)",
+        "operationId": "crearCita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NuevaCita"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cita creada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 4
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Rol no permitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citas/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 2
+        }
+      ],
+      "get": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Ver una cita propia",
+        "operationId": "verCita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Un estudiante solo puede ver sus propias citas; un profesional, las que tiene asignadas.",
+        "responses": {
+          "200": {
+            "description": "Cita",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cita"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Cancelar una cita o registrar notas",
+        "operationId": "modificarCita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "El estudiante solo puede cancelar sus citas. El profesional asignado puede marcarlas como atendidas y registrar notas.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambioCita"
+              },
+              "examples": {
+                "cancelar": {
+                  "summary": "Estudiante cancela",
+                  "value": {
+                    "estado": "cancelada"
+                  }
+                },
+                "notas": {
+                  "summary": "Profesional registra notas",
+                  "value": {
+                    "notas": "Evolución favorable."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cita actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Valor no permitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Campo no permitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reportes/ocupacion": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Citas por día (administrador)",
+        "operationId": "reporteOcupacion",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dias",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 90,
+              "default": 30
+            },
+            "description": "Días hacia atrás desde hoy (1 a 90)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total de citas por fecha",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "integer"
+                  }
+                },
+                "example": {
+                  "2026-11-18": 2,
+                  "2026-11-19": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Rango inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Solo administradores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Pegue aquí el valor de `token` que devuelve POST /api/login (sin la palabra Bearer)."
+      }
+    },
+    "schemas": {
+      "Credenciales": {
+        "type": "object",
+        "required": [
+          "correo",
+          "clave"
+        ],
+        "properties": {
+          "correo": {
+            "type": "string",
+            "format": "email"
+          },
+          "clave": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "Registro": {
+        "type": "object",
+        "required": [
+          "correo",
+          "clave"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "maxLength": 80,
+            "example": "Eva Martínez"
+          },
+          "correo": {
+            "type": "string",
+            "format": "email",
+            "example": "eva@uniminuto.edu.co"
+          },
+          "clave": {
+            "type": "string",
+            "format": "password",
+            "minLength": 10,
+            "example": "ClaveSegura2026*"
+          }
+        }
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "rol": {
+            "type": "string",
+            "enum": [
+              "estudiante",
+              "profesional",
+              "admin"
+            ]
+          }
+        }
+      },
+      "Cita": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "estudiante_id": {
+            "type": "integer"
+          },
+          "profesional_id": {
+            "type": "integer"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date"
+          },
+          "servicio": {
+            "type": "string",
+            "enum": [
+              "Psicología",
+              "Asesoría académica",
+              "Salud"
+            ]
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "notas": {
+            "type": "string",
+            "description": "Notas clínicas. Solo las ve el profesional asignado."
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "programada",
+              "cancelada",
+              "atendida"
+            ]
+          }
+        }
+      },
+      "NuevaCita": {
+        "type": "object",
+        "required": [
+          "fecha",
+          "servicio"
+        ],
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-12-01"
+          },
+          "servicio": {
+            "type": "string",
+            "enum": [
+              "Psicología",
+              "Asesoría académica",
+              "Salud"
+            ]
+          },
+          "motivo": {
+            "type": "string",
+            "maxLength": 300,
+            "example": "Orientación vocacional"
+          }
+        }
+      },
+      "CambioCita": {
+        "type": "object",
+        "properties": {
+          "estado": {
+            "type": "string",
+            "enum": [
+              "cancelada",
+              "atendida"
+            ]
+          },
+          "notas": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        }
+      },
+      "Mensaje": {
+        "type": "object",
+        "properties": {
+          "mensaje": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
