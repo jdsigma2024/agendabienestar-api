@@ -1,29 +1,56 @@
-# Pipeline DevSecOps de AgendaBienestar: cada push o pull request pasa por
-# secretos -> SAST -> SCA -> pruebas de seguridad. Si un paso falla, no se integra.
+# Pipeline DevSecOps de AgendaBienestar.
+# Cada push o pull request pasa por: secretos -> SAST -> SCA -> pruebas de seguridad.
+# Si un paso falla, el pipeline queda en rojo y el cambio no deberia integrarse (quality gate).
+#
+# Tambien se ejecuta a mano: pestana Actions > devsecops > Run workflow,
+# eligiendo la version a analizar (seguro o vulnerable).
 name: devsecops
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Carpeta a analizar"
+        type: choice
+        options: [seguro, vulnerable]
+        default: seguro
+
+env:
+  # En push y pull request se analiza siempre la version corregida (la que se desplegaria).
+  VERSION: ${{ inputs.version || 'seguro' }}
 
 jobs:
   secretos:
+    name: Secretos (gitleaks)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with: { fetch-depth: 0 }   # todo el historial: un secreto borrado sigue en commits viejos
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   sast:
+    name: SAST (Bandit)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verificar que existe la carpeta a analizar
+        run: |
+          if [ ! -f "$VERSION/app.py" ]; then
+            echo "::error::No existe $VERSION/app.py. Cree la carpeta seguro/ (Parte 7 de la guia) o ejecute el pipeline con version=vulnerable."
+            exit 1
+          fi
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install bandit
-      # Falla si hay hallazgos de severidad media o alta en la version que se despliega
-      - run: bandit -r seguro -ll
+      # -ll: falla solo con hallazgos de severidad media o alta
+      - run: bandit -r "$VERSION" -ll
 
   sca:
+    name: SCA (pip-audit)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +60,7 @@ jobs:
       - run: pip-audit -r requirements.txt
 
   pruebas-seguridad:
+    name: Pruebas de seguridad (pytest)
     needs: [secretos, sast, sca]
     runs-on: ubuntu-latest
     steps:
@@ -40,4 +68,4 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install -r requirements.txt
-      - run: APP=seguro pytest -v
+      - run: APP="$VERSION" pytest -v
