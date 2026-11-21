@@ -1,9 +1,9 @@
 # Pipeline DevSecOps de AgendaBienestar.
 # Cada push o pull request pasa por: secretos -> SAST -> SCA -> pruebas de seguridad.
-# Si un paso falla, el pipeline queda en rojo y el cambio no deberia integrarse (quality gate).
 #
-# Tambien se ejecuta a mano: pestana Actions > devsecops > Run workflow,
-# eligiendo la version a analizar (seguro o vulnerable).
+# Version que se analiza:
+#   - Ejecucion manual (Actions > devsecops > Run workflow): la que se elija.
+#   - Push o pull request: seguro/ si existe; si no, vulnerable/.
 name: devsecops
 
 on:
@@ -16,10 +16,6 @@ on:
         type: choice
         options: [seguro, vulnerable]
         default: seguro
-
-env:
-  # En push y pull request se analiza siempre la version corregida (la que se desplegaria).
-  VERSION: ${{ inputs.version || 'seguro' }}
 
 jobs:
   secretos:
@@ -37,12 +33,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verificar que existe la carpeta a analizar
+      - name: Elegir la version a analizar
         run: |
-          if [ ! -f "$VERSION/app.py" ]; then
-            echo "::error::No existe $VERSION/app.py. Cree la carpeta seguro/ (Parte 7 de la guia) o ejecute el pipeline con version=vulnerable."
+          if [ -n "${{ inputs.version }}" ]; then V="${{ inputs.version }}"
+          elif [ -f seguro/app.py ]; then V=seguro
+          else V=vulnerable; fi
+          if [ ! -f "$V/app.py" ]; then
+            echo "::error::No existe $V/app.py."
             exit 1
           fi
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+          echo "Se analiza la carpeta: $V"
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install bandit
@@ -62,10 +63,20 @@ jobs:
   pruebas-seguridad:
     name: Pruebas de seguridad (pytest)
     needs: [secretos, sast, sca]
+    # Se ejecuta aunque algun paso anterior falle, para ver siempre el resultado de las pruebas.
+    # El pipeline sigue quedando en rojo si alguno fallo.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Elegir la version a analizar
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then V="${{ inputs.version }}"
+          elif [ -f seguro/app.py ]; then V=seguro
+          else V=vulnerable; fi
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+          echo "Se analiza la carpeta: $V"
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install -r requirements.txt
-      - run: APP="$VERSION" pytest -v
+      - run:
