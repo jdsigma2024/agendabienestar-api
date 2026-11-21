@@ -16,6 +16,17 @@ RAIZ = pathlib.Path(__file__).resolve().parent.parent
 os.environ["BIENESTAR_AUTO_INIT"] = "0"  # cada prueba crea su propia base temporal
 
 
+
+def pytest_sessionstart(session):
+    """Si la carpeta indicada en APP no existe, se detiene con un mensaje claro."""
+    carpeta = os.environ.get("APP", "vulnerable")
+    if not (RAIZ / carpeta / "app.py").exists():
+        pytest.exit(
+            f"No existe {carpeta}/app.py. Si es la versión corregida, créela copiando "
+            f"vulnerable/app.py a {carpeta}/app.py (Parte 7 de la guía), o ejecute con APP=vulnerable.",
+            returncode=1,
+        )
+
 def cargar_app(carpeta):
     ruta = RAIZ / carpeta / "app.py"
     spec = importlib.util.spec_from_file_location(f"app_{carpeta}", ruta)
