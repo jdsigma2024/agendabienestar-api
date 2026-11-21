@@ -1,7 +1,7 @@
 # Archivo SOLO para el ejercicio de analisis de composicion de software (SCA).
 # Simula el requirements.txt de una version antigua de AgendaBienestar.
 # NO lo instale: analicelo con   pip-audit -r requirements-auditoria.txt --no-deps --disable-pip
-flask==0.12.2
+flask==3.1.3
 jinja2==2.10
 werkzeug==0.14.1
 pyyaml==5.3
