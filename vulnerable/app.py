@@ -4,6 +4,8 @@ AgendaBienestar UNIMINUTO - API de citas de Bienestar Universitario
 VERSION VULNERABLE: escrita con fallas INTENCIONALES para la actividad de
 Desarrollo de Software Seguro (Unidad 2). Usela solo en su equipo (localhost).
 
+Uniminuto 2026 - 409 calle 80
+
 Ejecutar:  python app.py      ->  http://127.0.0.1:5000
 """
 import base64
